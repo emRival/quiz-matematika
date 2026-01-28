@@ -5,43 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kuis Matematika Kelas Interaktif</title>
     
-    <!-- Load Tailwind CSS (Desain) -->
+   
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font: Nunito (Clean, Rounded, Very Readable) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Load React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Load Babel (Agar browser bisa baca kode React) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#0f172a',
+                        card: '#1e293b',
+                        primary: '#4f46e5', // Indigo lebih tegas
+                        secondary: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        /* Animasi Kustom */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-in { animation: fadeIn 0.3s ease-out forwards; }
-        .slide-up { animation: fadeIn 0.5s ease-out forwards; }
+        body { font-family: 'Nunito', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .anim-slide { animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .anim-scale { animation: scaleIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
     </style>
 </head>
-<body class="bg-slate-900 text-white">
+<body class="bg-gradient-to-br from-slate-900 via-[#1e1b4b] to-indigo-950 text-white min-h-screen select-none overflow-hidden">
 
     <div id="root"></div>
 
     <script type="text/babel">
-        // --- DATA IKON (SVG Paths) ---
-        // Kita inline SVG agar tidak perlu library eksternal yang rumit di HTML biasa
+        // --- CLEAN ICONS ---
         const Icons = {
-            Settings: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
-            Play: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>,
-            RefreshCw: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>,
-            Eye: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>,
-            EyeOff: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7c.44 0 .87-.03 1.28-.09"/><line x1="2" x2="22" y1="2" y2="22"/></svg>,
-            ArrowLeft: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
-            CheckCircle2: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>,
-            Shuffle: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l14.2-12.6"/><path d="M2 6h1.4c1.3 0 2.5.6 3.3 1.7l14.2 12.6"/><path d="M20 2l4 4-4 4"/><path d="M20 14l4 4-4 4"/></svg>,
-            Timer: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg>,
-            Keyboard: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2" ry="2"/><path d="M6 8h.001"/><path d="M10 8h.001"/><path d="M14 8h.001"/><path d="M18 8h.001"/><path d="M6 12h.001"/><path d="M10 12h.001"/><path d="M14 12h.001"/><path d="M18 12h.001"/><path d="M7 16h10"/></svg>,
-            Volume2: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>,
-            VolumeX: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>
+            Settings: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+            Play: <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M5 3l14 9-14 9V3z"/></svg>,
+            Refresh: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M21 21v-5h-5"/></svg>,
+            Eye: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>,
+            EyeOff: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7c.44 0 .87-.03 1.28-.09"/><line x1="2" x2="22" y1="2" y2="22"/></svg>,
+            ArrowLeft: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
+            Check: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+            Shuffle: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l14.2-12.6"/><path d="M2 6h1.4c1.3 0 2.5.6 3.3 1.7l14.2 12.6"/><path d="M20 2l4 4-4 4"/><path d="M20 14l4 4-4 4"/></svg>,
+            Timer: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+            Volume: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>,
+            VolumeMute: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>,
+            Percent: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
         };
 
         const Icon = ({ name, size = 24, className }) => {
@@ -53,90 +81,77 @@
             );
         };
 
-        // --- APLIKASI UTAMA ---
+        // --- APP ---
         const App = () => {
             const [screen, setScreen] = React.useState('setup'); 
             const [difficulty, setDifficulty] = React.useState('easy'); 
             const [isMixedMode, setIsMixedMode] = React.useState(false); 
+            const [isDecimalMode, setIsDecimalMode] = React.useState(false);
             const [timerMode, setTimerMode] = React.useState(0); 
             const [timeLeft, setTimeLeft] = React.useState(0);
             const [isMuted, setIsMuted] = React.useState(false);
             
             const [operations, setOperations] = React.useState({
-                add: true,
-                subtract: true,
-                multiply: true,
-                divide: true,
+                add: true, subtract: true, multiply: true, divide: true,
             });
             
             const [currentQuestion, setCurrentQuestion] = React.useState(null);
             const [showAnswer, setShowAnswer] = React.useState(false);
             const [animate, setAnimate] = React.useState(false);
 
-            // --- LOGIKA AUDIO ---
+            // --- HELPERS ---
+            const formatNumber = (num) => typeof num === 'number' ? num.toString().replace('.', ',') : num;
+            const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+            const fixFloat = (num) => parseFloat(num.toFixed(2));
+
+            // --- AUDIO ---
             const playSound = (type) => {
                 if (isMuted) return;
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (!AudioContext) return;
-
                 const ctx = new AudioContext();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
-
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 const now = ctx.currentTime;
 
                 if (type === 'success') {
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(587.33, now);
-                    osc.frequency.exponentialRampToValueAtTime(1174.66, now + 0.1);
-                    gain.gain.setValueAtTime(0.3, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
-                    osc.start(now);
-                    osc.stop(now + 0.8);
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                    osc.start(now); osc.stop(now + 0.5);
                 } else if (type === 'tick') {
                     osc.type = 'triangle';
                     osc.frequency.setValueAtTime(800, now);
                     gain.gain.setValueAtTime(0.1, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-                    osc.start(now);
-                    osc.stop(now + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.start(now); osc.stop(now + 0.05);
                 } else if (type === 'timeout') {
                     osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(200, now);
-                    osc.frequency.linearRampToValueAtTime(50, now + 0.5);
-                    gain.gain.setValueAtTime(0.3, now);
-                    gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
-                    osc.start(now);
-                    osc.stop(now + 0.5);
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.linearRampToValueAtTime(50, now + 0.4);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.001, now + 0.4);
+                    osc.start(now); osc.stop(now + 0.4);
                 }
             };
 
-            // --- LOGIKA UTILITAS ---
-            const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-            
             const getSymbol = (op) => {
                 switch(op) {
-                    case 'add': return '+';
-                    case 'subtract': return '-';
-                    case 'multiply': return '×';
-                    case 'divide': return '÷';
-                    default: return '?';
+                    case 'add': return '+'; case 'subtract': return '-'; case 'multiply': return '×'; case 'divide': return '÷'; default: return '?';
                 }
             };
 
             const calculate = (n1, op, n2) => {
                 switch(op) {
-                    case 'add': return n1 + n2;
-                    case 'subtract': return n1 - n2;
-                    case 'multiply': return n1 * n2;
-                    case 'divide': return n1 / n2;
-                    default: return 0;
+                    case 'add': return n1 + n2; case 'subtract': return n1 - n2; case 'multiply': return n1 * n2; case 'divide': return n1 / n2; default: return 0;
                 }
             };
 
-            // --- GENERATE SOAL ---
+            // --- GENERATOR LOGIC ---
             const generateQuestion = React.useCallback(() => {
                 setAnimate(true);
                 setShowAnswer(false);
@@ -145,7 +160,7 @@
                 const activeOps = Object.keys(operations).filter(op => operations[op]);
                 if (activeOps.length === 0) {
                     if(screen === 'setup') return;
-                    alert("Pilih setidaknya satu jenis operasi matematika!");
+                    alert("Pilih minimal satu operasi!");
                     setScreen('setup');
                     return;
                 }
@@ -155,85 +170,102 @@
 
                 while (!validQuestion && attempts < 200) {
                     attempts++;
-                    
-                    if (isMixedMode) {
-                        const op1 = activeOps[getRandomInt(0, activeOps.length - 1)];
-                        const op2 = activeOps[getRandomInt(0, activeOps.length - 1)];
-                        
-                        let min = 1, max = 10;
-                        if (difficulty === 'medium') { min = 2; max = 12; }
-                        if (difficulty === 'hard') { min = 5; max = 25; }
-
-                        let n1 = getRandomInt(min, max);
-                        let n2 = getRandomInt(min, max);
-                        let n3 = getRandomInt(min, max);
-
-                        if (op1 === 'divide') n1 = n1 * n2;
-                        if (op2 === 'divide' && op1 !== 'multiply' && op1 !== 'divide') n2 = n2 * n3;
-
-                        let result;
-                        const isOp1High = op1 === 'multiply' || op1 === 'divide';
-                        const isOp2High = op2 === 'multiply' || op2 === 'divide';
-
-                        if (isOp2High && !isOp1High) {
-                            const mid = calculate(n2, op2, n3);
-                            result = calculate(n1, op1, mid);
+                    // Logic Generate (Same as robust logic before)
+                    if (isDecimalMode) {
+                        const scale = 10; 
+                        if (isMixedMode) {
+                            const op1 = activeOps[getRandomInt(0, activeOps.length - 1)];
+                            const op2 = activeOps[getRandomInt(0, activeOps.length - 1)];
+                            let min = 1, max = 10; 
+                            if (difficulty === 'medium') { max = 15; }
+                            if (difficulty === 'hard') { max = 20; }
+                            let n1 = getRandomInt(min * scale, max * scale) / scale;
+                            let n2 = getRandomInt(min * scale, max * scale) / scale;
+                            let n3 = getRandomInt(min * scale, max * scale) / scale;
+                            let result;
+                            const isOp1High = op1 === 'multiply' || op1 === 'divide';
+                            const isOp2High = op2 === 'multiply' || op2 === 'divide';
+                            if (isOp2High && !isOp1High) {
+                                const mid = calculate(n2, op2, n3);
+                                result = calculate(n1, op1, mid);
+                            } else {
+                                const mid = calculate(n1, op1, n2);
+                                result = calculate(mid, op2, n3);
+                            }
+                            const resultClean = fixFloat(result);
+                            if (resultClean.toString().length <= 6 && Math.abs(resultClean) <= 100) {
+                                validQuestion = { parts: [n1, getSymbol(op1), n2, getSymbol(op2), n3], answer: resultClean };
+                            }
                         } else {
-                            const mid = calculate(n1, op1, n2);
-                            result = calculate(mid, op2, n3);
-                        }
-
-                        const isInteger = Number.isInteger(result);
-                        const isPositive = result >= 0;
-                        const notTooBig = difficulty === 'hard' ? true : result <= 150; 
-
-                        if (isInteger && isPositive && notTooBig) {
-                            validQuestion = {
-                                parts: [n1, getSymbol(op1), n2, getSymbol(op2), n3],
-                                answer: result
-                            };
+                            const op = activeOps[getRandomInt(0, activeOps.length - 1)];
+                            let min = 1, max = 10;
+                            if (difficulty === 'medium') max = 20; if (difficulty === 'hard') max = 50;
+                            let n1 = getRandomInt(min * scale, max * scale) / scale;
+                            let n2 = getRandomInt(min * scale, max * scale) / scale;
+                            if (op === 'subtract' && n1 < n2) { [n1, n2] = [n2, n1]; }
+                            if (op === 'divide') {
+                                let ans = getRandomInt(min * scale, max * scale) / scale;
+                                n2 = getRandomInt(1, 10); n1 = fixFloat(ans * n2);
+                                validQuestion = { parts: [n1, getSymbol(op), n2], answer: ans };
+                            } else {
+                                const res = fixFloat(calculate(n1, op, n2));
+                                if (res.toString().length <= 7) validQuestion = { parts: [n1, getSymbol(op), n2], answer: res };
+                            }
                         }
                     } else {
-                        const op = activeOps[getRandomInt(0, activeOps.length - 1)];
-                        let n1, n2;
-
-                        if (difficulty === 'easy') { n1 = getRandomInt(1, 10); n2 = getRandomInt(1, 10); }
-                        else if (difficulty === 'medium') { 
-                            if (op === 'multiply' || op === 'divide') { n1 = getRandomInt(2, 12); n2 = getRandomInt(2, 10); }
-                            else { n1 = getRandomInt(10, 50); n2 = getRandomInt(5, 40); }
+                        if (isMixedMode) {
+                            const op1 = activeOps[getRandomInt(0, activeOps.length - 1)];
+                            const op2 = activeOps[getRandomInt(0, activeOps.length - 1)];
+                            let min = 1, max = 10;
+                            if (difficulty === 'medium') { min = 2; max = 12; }
+                            if (difficulty === 'hard') { min = 5; max = 25; }
+                            let n1 = getRandomInt(min, max); let n2 = getRandomInt(min, max); let n3 = getRandomInt(min, max);
+                            if (op1 === 'divide') n1 = n1 * n2;
+                            if (op2 === 'divide' && op1 !== 'multiply' && op1 !== 'divide') n2 = n2 * n3;
+                            let result;
+                            const isOp1High = op1 === 'multiply' || op1 === 'divide';
+                            const isOp2High = op2 === 'multiply' || op2 === 'divide';
+                            if (isOp2High && !isOp1High) {
+                                const mid = calculate(n2, op2, n3);
+                                result = calculate(n1, op1, mid);
+                            } else {
+                                const mid = calculate(n1, op1, n2);
+                                result = calculate(mid, op2, n3);
+                            }
+                            if (Number.isInteger(result) && result >= 0 && (difficulty === 'hard' || result <= 150)) {
+                                validQuestion = { parts: [n1, getSymbol(op1), n2, getSymbol(op2), n3], answer: result };
+                            }
+                        } else {
+                            const op = activeOps[getRandomInt(0, activeOps.length - 1)];
+                            let n1, n2;
+                            if (difficulty === 'easy') { n1 = getRandomInt(1, 10); n2 = getRandomInt(1, 10); }
+                            else if (difficulty === 'medium') { 
+                                if (op === 'multiply' || op === 'divide') { n1 = getRandomInt(2, 12); n2 = getRandomInt(2, 10); }
+                                else { n1 = getRandomInt(10, 50); n2 = getRandomInt(5, 40); }
+                            }
+                            else { 
+                                if (op === 'multiply' || op === 'divide') { n1 = getRandomInt(12, 30); n2 = getRandomInt(4, 20); }
+                                else { n1 = getRandomInt(100, 999); n2 = getRandomInt(50, 500); }
+                            }
+                            if (op === 'divide') { let temp = n1 * n2; n1 = temp; }
+                            if (op === 'subtract' && difficulty !== 'hard' && n1 < n2) { [n1, n2] = [n2, n1]; }
+                            const res = calculate(n1, op, n2);
+                            validQuestion = { parts: [n1, getSymbol(op), n2], answer: res };
                         }
-                        else { 
-                            if (op === 'multiply' || op === 'divide') { n1 = getRandomInt(12, 30); n2 = getRandomInt(4, 20); }
-                            else { n1 = getRandomInt(100, 999); n2 = getRandomInt(50, 500); }
-                        }
-
-                        if (op === 'divide') { let temp = n1 * n2; n1 = temp; }
-                        if (op === 'subtract' && difficulty !== 'hard' && n1 < n2) { [n1, n2] = [n2, n1]; }
-
-                        const res = calculate(n1, op, n2);
-                        validQuestion = { parts: [n1, getSymbol(op), n2], answer: res };
                     }
                 }
-
                 if (!validQuestion) validQuestion = { parts: [10, '+', 5], answer: 15 };
                 setCurrentQuestion(validQuestion);
                 setTimeout(() => setAnimate(false), 300);
-            }, [operations, isMixedMode, difficulty, timerMode, screen]);
+            }, [operations, isMixedMode, isDecimalMode, difficulty, timerMode, screen]);
 
-            React.useEffect(() => {
-                if (showAnswer) {
-                    playSound('success');
-                }
-            }, [showAnswer]);
-
+            // Effects
             React.useEffect(() => {
                 let interval = null;
                 if (screen === 'quiz' && timerMode > 0 && timeLeft > 0 && !showAnswer) {
                     interval = setInterval(() => {
                         setTimeLeft((prev) => {
-                            if (prev <= 4 && prev > 1) { 
-                                playSound('tick'); 
-                            }
+                            if (prev <= 4 && prev > 1) playSound('tick');
                             return prev - 1;
                         });
                     }, 1000);
@@ -243,15 +275,13 @@
                 return () => clearInterval(interval);
             }, [timeLeft, screen, timerMode, showAnswer]);
 
+            React.useEffect(() => { if (showAnswer) playSound('success'); }, [showAnswer]);
+
             React.useEffect(() => {
                 const handleKeyDown = (e) => {
                     if (screen !== 'quiz') return;
-                    if (e.code === 'Space') {
-                        e.preventDefault(); 
-                        generateQuestion();
-                    } else if (e.code === 'Enter') {
-                        setShowAnswer((prev) => !prev);
-                    }
+                    if (e.code === 'Space') { e.preventDefault(); generateQuestion(); }
+                    else if (e.code === 'Enter') setShowAnswer(prev => !prev);
                 };
                 window.addEventListener('keydown', handleKeyDown);
                 return () => window.removeEventListener('keydown', handleKeyDown);
@@ -259,36 +289,37 @@
 
             const handleStart = () => {
                 const activeOps = Object.keys(operations).filter(op => operations[op]);
-                if (activeOps.length === 0) {
-                    alert("Mohon pilih minimal satu operasi.");
-                    return;
-                }
+                if (activeOps.length === 0) { alert("Pilih minimal satu operasi."); return; }
                 generateQuestion();
                 setScreen('quiz');
             };
 
-            const toggleOperation = (op) => {
-                setOperations(prev => ({ ...prev, [op]: !prev[op] }));
-            };
+            const toggleOperation = (op) => setOperations(prev => ({ ...prev, [op]: !prev[op] }));
 
-            // --- UI RENDER ---
+            // --- VIEW: SETUP ---
             if (screen === 'setup') {
                 return (
-                    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans text-slate-800">
-                        <div className="bg-white max-w-lg w-full rounded-2xl shadow-xl p-6 md:p-8 border border-slate-200">
-                            <div className="flex items-center justify-center mb-6 text-indigo-600">
-                                <Icon name="Settings" size={36} />
-                                <h1 className="text-2xl font-bold ml-3">Pengaturan Kuis</h1>
+                    <div className="min-h-screen flex items-center justify-center p-4">
+                        <div className="bg-white/95 backdrop-blur-xl max-w-lg w-full rounded-3xl shadow-2xl p-8 border border-white/20 anim-slide">
+                            <div className="text-center mb-8">
+                                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 text-primary rounded-2xl mb-4">
+                                    <Icon name="Settings" size={32} />
+                                </div>
+                                <h1 className="text-3xl font-bold text-slate-800">Pengaturan Kuis</h1>
+                                <p className="text-slate-500 mt-1">Sesuaikan materi soal untuk kelas Anda</p>
                             </div>
 
                             <div className="space-y-6">
+                                {/* Difficulty */}
                                 <div>
-                                    <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Tingkat Kesulitan</h2>
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Tingkat Kesulitan</label>
+                                    <div className="grid grid-cols-3 gap-3">
                                         {['easy', 'medium', 'hard'].map((level) => (
                                             <button key={level} onClick={() => setDifficulty(level)}
-                                                className={`py-2 px-3 rounded-lg font-bold text-sm transition-all ${
-                                                    difficulty === level ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                                className={`py-3 px-4 rounded-xl font-bold text-sm transition-all duration-200 border-2 ${
+                                                    difficulty === level 
+                                                    ? 'bg-primary border-primary text-white shadow-lg transform scale-105' 
+                                                    : 'bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-300'
                                                 }`}>
                                                 {level === 'easy' ? 'Mudah' : level === 'medium' ? 'Sedang' : 'Sulit'}
                                             </button>
@@ -296,58 +327,71 @@
                                     </div>
                                 </div>
 
+                                {/* Modes */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <button onClick={() => setIsMixedMode(!isMixedMode)}
+                                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-200 ${
+                                            isMixedMode ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100'
+                                        }`}>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <Icon name="Shuffle" size={20} />
+                                            <span className="font-bold">3 Angka</span>
+                                        </div>
+                                        <span className="text-xs opacity-70">A + B x C</span>
+                                    </button>
+
+                                    <button onClick={() => setIsDecimalMode(!isDecimalMode)}
+                                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-200 ${
+                                            isDecimalMode ? 'bg-pink-50 border-pink-500 text-pink-700' : 'bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100'
+                                        }`}>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <Icon name="Percent" size={20} />
+                                            <span className="font-bold">Desimal</span>
+                                        </div>
+                                        <span className="text-xs opacity-70">0,5 + 1,2</span>
+                                    </button>
+                                </div>
+
+                                {/* Timer */}
                                 <div>
-                                    <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Timer (Detik)</h2>
-                                    <div className="grid grid-cols-4 gap-2">
+                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Timer</label>
+                                    <div className="flex gap-2">
                                         {[0, 10, 30, 60].map((t) => (
                                             <button key={t} onClick={() => setTimerMode(t)}
-                                                className={`py-2 px-2 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-1 ${
-                                                    timerMode === t ? 'bg-amber-500 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                                className={`flex-1 py-2 rounded-xl font-bold text-sm transition-all border ${
+                                                    timerMode === t 
+                                                    ? 'bg-secondary border-secondary text-white shadow-md' 
+                                                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                                                 }`}>
-                                                {t === 0 ? 'Mati' : t + 's'}
+                                                {t === 0 ? 'Off' : t + 's'}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
 
-                                <div onClick={() => setIsMixedMode(!isMixedMode)}
-                                    className={`flex items-center justify-between p-3 rounded-xl cursor-pointer border-2 transition-all ${
-                                        isMixedMode ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 hover:border-slate-300'
-                                    }`}>
-                                    <div className="flex items-center gap-3">
-                                        <div className={`p-2 rounded-lg ${isMixedMode ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
-                                            <Icon name="Shuffle" size={18} />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className={`font-bold text-sm ${isMixedMode ? 'text-indigo-900' : 'text-slate-600'}`}>Soal Campuran (3 Angka)</span>
-                                        </div>
-                                    </div>
-                                    {isMixedMode && <span className="text-indigo-600"><Icon name="CheckCircle2" size={18} /></span>}
-                                </div>
-
+                                {/* Operations */}
                                 <div>
-                                    <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Operasi</h2>
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Operasi</label>
+                                    <div className="grid grid-cols-4 gap-2">
                                         {[
-                                            { key: 'add', label: 'Tambah (+)' }, { key: 'subtract', label: 'Kurang (-)' },
-                                            { key: 'multiply', label: 'Kali (×)' }, { key: 'divide', label: 'Bagi (÷)' }
+                                            { key: 'add', label: '+' }, { key: 'subtract', label: '-' },
+                                            { key: 'multiply', label: '×' }, { key: 'divide', label: '÷' }
                                         ].map((op) => (
-                                            <div key={op.key} onClick={() => toggleOperation(op.key)}
-                                                className={`flex items-center p-2 rounded-lg cursor-pointer border transition-all ${
-                                                    operations[op.key] ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-slate-200 hover:bg-slate-50'
+                                            <button key={op.key} onClick={() => toggleOperation(op.key)}
+                                                className={`aspect-square rounded-xl flex items-center justify-center text-xl font-bold transition-all border-2 ${
+                                                    operations[op.key] 
+                                                    ? 'bg-emerald-50 border-emerald-500 text-emerald-600' 
+                                                    : 'bg-slate-50 border-slate-100 text-slate-300 hover:bg-slate-100'
                                                 }`}>
-                                                <div className={`w-4 h-4 rounded flex items-center justify-center mr-2 ${operations[op.key] ? 'bg-indigo-600 text-white' : 'bg-slate-200'}`}>
-                                                    {operations[op.key] && <Icon name="CheckCircle2" size={12} />}
-                                                </div>
-                                                <span className="font-medium text-sm">{op.label}</span>
-                                            </div>
+                                                {op.label}
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
 
                                 <button onClick={handleStart}
-                                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
-                                    <Icon name="Play" size={20} />
+                                    className="w-full bg-slate-800 hover:bg-slate-900 text-white text-lg font-bold py-4 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3 mt-4">
+                                    <Icon name="Play" size={24} />
                                     Mulai Kuis
                                 </button>
                             </div>
@@ -356,87 +400,95 @@
                 );
             }
 
+            // --- VIEW: QUIZ ---
             return (
-                <div className="min-h-screen bg-slate-900 flex flex-col font-sans text-white relative overflow-hidden transition-colors duration-500"
-                    style={{ backgroundColor: (timeLeft === 0 && timerMode > 0 && !showAnswer) ? '#7f1d1d' : '' }}> 
+                <div className={`min-h-screen flex flex-col relative transition-colors duration-500 ${
+                    timeLeft === 0 && timerMode > 0 && !showAnswer ? 'bg-red-950' : ''
+                }`}>
                     
-                    <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-10">
+                    {/* Navbar */}
+                    <div className="absolute top-0 w-full p-6 flex justify-between items-center z-10">
                         <button onClick={() => setScreen('setup')}
-                            className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors bg-slate-800/50 px-3 py-2 rounded-full hover:bg-slate-800">
+                            className="glass-panel text-white/80 hover:text-white hover:bg-white/10 px-5 py-2.5 rounded-full flex items-center gap-2 transition-all text-sm font-semibold tracking-wide">
                             <Icon name="ArrowLeft" size={18} />
-                            <span className="hidden md:inline text-sm">Kembali</span>
+                            SETUP
                         </button>
                         
-                        {timerMode > 0 && (
-                            <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-mono text-xl font-bold shadow-lg transition-all ${
-                                timeLeft <= 3 && !showAnswer ? 'bg-red-600 text-white scale-110 animate-pulse' : 'bg-slate-800 text-amber-400'
-                            }`}>
-                                <Icon name="Timer" size={20} />
-                                {timeLeft}s
-                            </div>
-                        )}
-
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-4 items-center">
+                            {timerMode > 0 && (
+                                <div className={`px-5 py-2.5 rounded-full font-mono text-xl font-bold shadow-lg flex items-center gap-2 transition-all ${
+                                    timeLeft <= 3 && !showAnswer ? 'bg-red-500 text-white scale-110 animate-pulse' : 'glass-panel text-amber-400'
+                                }`}>
+                                    <Icon name="Timer" size={20} />
+                                    {timeLeft}
+                                </div>
+                            )}
                             <button onClick={() => setIsMuted(!isMuted)}
-                                className={`p-2 rounded-full transition-colors ${isMuted ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-300 hover:text-white'}`}
-                                title={isMuted ? "Unmute" : "Mute"}>
-                                <Icon name={isMuted ? "VolumeX" : "Volume2"} size={18} />
+                                className={`w-10 h-10 flex items-center justify-center rounded-full glass-panel hover:bg-white/10 transition-colors ${isMuted ? 'text-red-400' : 'text-white/80'}`}>
+                                <Icon name={isMuted ? "VolumeMute" : "Volume"} size={20} />
                             </button>
-                            <div className="hidden md:flex items-center gap-2 text-slate-500 text-xs bg-slate-800/50 px-3 py-1 rounded-full border border-slate-700">
-                                <Icon name="Keyboard" size={12} />
-                                <span>Spasi = Baru | Enter = Jawab</span>
-                            </div>
                         </div>
                     </div>
 
-                    <div className="flex-1 flex flex-col items-center justify-center w-full max-w-7xl mx-auto p-4">
+                    {/* Main Stage */}
+                    <div className="flex-1 flex flex-col items-center justify-center w-full max-w-6xl mx-auto p-6">
+                        
+                        {/* Question Box */}
                         <div className={`
-                            relative w-full aspect-video max-h-[55vh] flex flex-col items-center justify-center
-                            bg-white rounded-3xl shadow-2xl text-slate-800 p-4 mb-6 transition-all duration-300
-                            ${animate ? 'scale-95 opacity-90' : 'scale-100 opacity-100'}
+                            w-full aspect-video max-h-[50vh] flex flex-col items-center justify-center
+                            bg-white rounded-[3rem] shadow-2xl mb-8 p-8 transition-all duration-300 relative overflow-hidden
+                            ${animate ? 'scale-95 opacity-80' : 'scale-100 opacity-100'}
                         `}>
-                            <div className={`
-                                flex flex-wrap items-center justify-center gap-x-2 md:gap-x-4 gap-y-4 font-bold leading-none tracking-tight
-                                ${currentQuestion?.parts.length > 3 ? 'text-[6vw] md:text-[90px]' : 'text-[10vw] md:text-[140px]'}
-                            `}>
+                            {/* Decorative blobs */}
+                            <div className="absolute -top-20 -left-20 w-60 h-60 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
+                            <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-purple-100 rounded-full blur-3xl opacity-50"></div>
+
+                            {/* The Problem */}
+                            <div className="relative z-10 flex flex-wrap items-center justify-center gap-x-4 md:gap-x-6 gap-y-4">
                                 {currentQuestion?.parts.map((part, index) => (
-                                    <span key={index} className={['+','-','×','÷'].includes(part) ? 'text-indigo-600' : 'text-slate-800'}>
-                                        {part}
+                                    <span key={index} className={`
+                                        font-bold leading-none tracking-tight
+                                        ${['+','-','×','÷'].includes(part) ? 'text-primary text-[10vw] md:text-[130px]' : 'text-slate-800 text-[10vw] md:text-[140px]'}
+                                    `}>
+                                        {typeof part === 'number' ? formatNumber(part) : part}
                                     </span>
                                 ))}
-                                <span className="text-slate-400 ml-2">=</span>
-                                <div className="relative min-w-[2ch] text-center ml-2">
+                                <span className="text-slate-300 text-[6vw] md:text-[80px]">=</span>
+                                
+                                {/* The Answer */}
+                                <div className="min-w-[1.5em] text-center">
                                     {showAnswer ? (
-                                        <span className="text-green-600 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                            {currentQuestion?.answer}
+                                        <span className="text-emerald-500 text-[10vw] md:text-[140px] font-bold anim-scale block">
+                                            {formatNumber(currentQuestion?.answer)}
                                         </span>
                                     ) : (
-                                        <span className="text-slate-200">?</span>
+                                        <span className="text-slate-200 text-[10vw] md:text-[140px] font-bold">?</span>
                                     )}
                                 </div>
                             </div>
                             
                             {timerMode > 0 && timeLeft === 0 && !showAnswer && (
-                                <div className="absolute bottom-8 text-red-500 font-bold text-xl md:text-2xl animate-bounce">
+                                <div className="absolute bottom-10 text-red-500 font-bold text-2xl animate-bounce bg-red-50 px-6 py-2 rounded-full">
                                     WAKTU HABIS!
                                 </div>
                             )}
                         </div>
 
-                        <div className="flex gap-3 w-full max-w-2xl">
+                        {/* Controls */}
+                        <div className="flex gap-4 w-full max-w-xl h-20">
                             <button onClick={() => setShowAnswer(!showAnswer)}
-                                className={`flex-1 flex items-center justify-center gap-2 py-4 md:py-5 rounded-2xl text-xl md:text-2xl font-bold transition-all shadow-lg active:scale-95
-                                    ${showAnswer ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-amber-500 hover:bg-amber-600 text-white'}`}>
+                                className={`flex-1 rounded-2xl text-xl font-bold flex items-center justify-center gap-3 transition-all duration-200 shadow-lg hover:-translate-y-1 active:translate-y-0
+                                    ${showAnswer 
+                                    ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' 
+                                    : 'bg-secondary hover:bg-amber-400 text-white'}`}>
                                 <Icon name={showAnswer ? "EyeOff" : "Eye"} size={28} />
-                                <span className="hidden md:inline">{showAnswer ? 'Tutup Jawaban' : 'Lihat Jawaban'}</span>
-                                <span className="md:hidden">{showAnswer ? 'Tutup' : 'Jawab'}</span>
+                                {showAnswer ? 'Tutup' : 'Lihat'}
                             </button>
 
                             <button onClick={generateQuestion}
-                                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2 py-4 md:py-5 rounded-2xl text-xl md:text-2xl font-bold shadow-lg transition-all active:scale-95">
-                                <Icon name="RefreshCw" size={28} />
-                                <span className="hidden md:inline">Soal Selanjutnya</span>
-                                <span className="md:hidden">Lanjut</span>
+                                className="flex-1 rounded-2xl text-xl font-bold flex items-center justify-center gap-3 transition-all duration-200 shadow-lg hover:-translate-y-1 active:translate-y-0 bg-primary hover:bg-indigo-500 text-white">
+                                <Icon name="Refresh" size={28} />
+                                Soal Baru
                             </button>
                         </div>
                     </div>
